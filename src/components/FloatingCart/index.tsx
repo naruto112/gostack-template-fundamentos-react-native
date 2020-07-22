@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Alert } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -12,7 +13,6 @@ import {
 } from './styles';
 
 import formatValue from '../../utils/formatValue';
-
 import { useCart } from '../../hooks/cart';
 
 // Calculo do total
@@ -47,7 +47,13 @@ const FloatingCart: React.FC = () => {
     <Container>
       <CartButton
         testID="navigate-to-cart-button"
-        onPress={() => navigation.navigate('Cart')}
+        onPress={
+          totalItensInCart > 0
+            ? () => navigation.navigate('Cart')
+            : () => {
+                Alert.alert('Deve adicionar pelo menos uma compra');
+              }
+        }
       >
         <FeatherIcon name="shopping-cart" size={24} color="#fff" />
         <CartButtonText>{`${totalItensInCart} itens`}</CartButtonText>

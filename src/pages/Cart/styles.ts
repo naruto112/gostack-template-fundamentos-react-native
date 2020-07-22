@@ -114,3 +114,10 @@ export const SubtotalValue = styled.Text`
   color: #fff;
   font-weight: bold;
 `;
+
+export const TrashView = styled.TouchableOpacity`
+  width: 100%;
+  margin-bottom: 55px;
+  align-items: flex-start;
+  left: 170px;
+`;

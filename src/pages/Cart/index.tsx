@@ -21,11 +21,13 @@ import {
   TotalProductsContainer,
   TotalProductsText,
   SubtotalValue,
+  TrashView,
 } from './styles';
 
 import { useCart } from '../../hooks/cart';
 
 import formatValue from '../../utils/formatValue';
+import FloatingCart from '../../components/FloatingCart';
 
 interface Product {
   id: string;
@@ -36,15 +38,7 @@ interface Product {
 }
 
 const Cart: React.FC = () => {
-  const { increment, decrement, products } = useCart();
-
-  function handleIncrement(id: string): void {
-    increment(id);
-  }
-
-  function handleDecrement(id: string): void {
-    decrement(id);
-  }
+  const { increment, decrement, products, trashCart } = useCart();
 
   const cartTotal = useMemo(() => {
     const total = products.reduce((accumulator, products) => {
@@ -98,13 +92,13 @@ const Cart: React.FC = () => {
               <ActionContainer>
                 <ActionButton
                   testID={`increment-${item.id}`}
-                  onPress={() => handleIncrement(item.id)}
+                  onPress={() => increment(item.id)}
                 >
                   <FeatherIcon name="plus" color="#E83F5B" size={16} />
                 </ActionButton>
                 <ActionButton
                   testID={`decrement-${item.id}`}
-                  onPress={() => handleDecrement(item.id)}
+                  onPress={() => decrement(item.id)}
                 >
                   <FeatherIcon name="minus" color="#E83F5B" size={16} />
                 </ActionButton>
@@ -113,11 +107,16 @@ const Cart: React.FC = () => {
           )}
         />
       </ProductContainer>
-      <TotalProductsContainer>
-        <FeatherIcon name="shopping-cart" color="#fff" size={24} />
-        <TotalProductsText>{`${totalItensInCart} itens`}</TotalProductsText>
-        <SubtotalValue>{cartTotal}</SubtotalValue>
-      </TotalProductsContainer>
+      <View>
+        {totalItensInCart > 0 ? (
+          <TrashView onPress={() => trashCart()}>
+            <FeatherIcon name="trash-2" color="#e83f5b" size={24} />
+          </TrashView>
+        ) : (
+          <View />
+        )}
+      </View>
+      <FloatingCart />
     </Container>
   );
 };

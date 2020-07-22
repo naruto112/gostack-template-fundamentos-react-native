@@ -21,6 +21,7 @@ interface CartContext {
   addToCart(item: Omit<Product, 'quantity'>): void;
   increment(id: string): void;
   decrement(id: string): void;
+  trashCart(): void;
 }
 
 const CartContext = createContext<CartContext | null>(null);
@@ -80,22 +81,36 @@ const CartProvider: React.FC = ({ children }) => {
 
   const decrement = useCallback(
     async id => {
-      const newProducts = products.map(product =>
-        product.id === id && product.quantity >= 1
-          ? { ...product, quantity: product.quantity - 1 }
-          : product,
-      );
-      setProducts(newProducts);
+      const newProducts = products.find(product => product.id === id);
+
+      if (newProducts && newProducts.quantity > 1) {
+        setProducts(
+          products.map(product =>
+            product.id !== id
+              ? product
+              : { ...product, quantity: product.quantity - 1 },
+          ),
+        );
+      } else {
+        setProducts(products.filter(product => product.id !== id));
+        // const restProducts = products.filter(product => product.id !== id);
+        // console.log(restProducts);
+      }
       await AsyncStorage.setItem(
         '@GoMarketplace:products',
-        JSON.stringify(newProducts),
+        JSON.stringify(products),
       );
     },
     [products],
   );
 
+  const trashCart = useCallback(async () => {
+    await AsyncStorage.removeItem('@GoMarketplace:products');
+    setProducts([]);
+  }, []);
+
   const value = React.useMemo(
-    () => ({ addToCart, increment, decrement, products }),
+    () => ({ addToCart, increment, decrement, products, trashCart }),
     [products, addToCart, increment, decrement],
   );
 
